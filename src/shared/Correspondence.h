@@ -14,7 +14,7 @@
 #include <fstream>
 
 #include "Mesh.h"
-#include "Grid.h"
+#include "Search.h"
 
 class Correspondence
 {

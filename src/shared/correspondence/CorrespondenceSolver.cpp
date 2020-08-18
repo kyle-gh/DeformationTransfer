@@ -72,8 +72,8 @@ bool CorrespondenceSolver::setTargetReference(MeshPtr mesh)
     
     _target = mesh;
     
-    _grid.setMesh(_target);
-    _grid.addVertices();
+    _search.setMesh(_target);
+    _search.addVertices();
     
     return true;
 }
@@ -231,7 +231,7 @@ void CorrespondenceSolver::solveSIC(const Weights& weights)
     appendIdentity(weights.identity, _m, _c);
     
     // Ec
-    CorrespondenceUtil::BuildVertex(_source, _grid, _nearestCorr);
+    CorrespondenceUtil::BuildVertex(_source, _search, _nearestCorr);
     appendClosest(_nearestCorr, weights.closest, _m, _c);
 }
 
@@ -263,10 +263,10 @@ void CorrespondenceSolver::constructCorrespondence()
     << "\t#Faces: " << _source->n_faces() << std::endl
     << "\tThreshold: " << threshold << std::endl;
     
-    _grid.setMesh(_source);
-    _grid.addFaces();
+    _search.setMesh(_source);
+    _search.addFaces();
     
-    CorrespondenceUtil::BuildFace(_target, _grid,  _faceCorr, threshold, _maxCorrespondence, true);
+    CorrespondenceUtil::BuildFace(_target, _search, _faceCorr, threshold, _maxCorrespondence, true);
     
     std::vector<unsigned int> noCorrespondence;
     

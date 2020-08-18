@@ -11,7 +11,7 @@
 
 #include "../Correspondence.h"
 #include "../Mesh.h"
-#include "../Grid.h"
+#include "../Search.h"
 
 #include <memory>
 #include <map>
@@ -26,9 +26,9 @@ public:
     
     static ConstraintMapPtr BuildConstraints(CorrespondencePtr corr, MeshPtr target);
     
-    static void BuildVertex(MeshPtr mesh, Grid& grid, Correspondence& corr, float threshold = -1.0, int limit = -1, bool defaultToNearest = false);
+    static void BuildVertex(MeshPtr mesh, Search& search, Correspondence& corr, float threshold = -1.0, int limit = -1, bool defaultToNearest = false);
     
-    static void BuildFace(MeshPtr mesh, Grid& grid, Correspondence& corr, float threshold = -1.0, int limit = -1, bool defaultToNearest = false);
+    static void BuildFace(MeshPtr mesh, Search& search, Correspondence& corr, float threshold = -1.0, int limit = -1, bool defaultToNearest = false);
     
     static void BuildAdjacency(MeshPtr mesh, Correspondence& corr);
 };

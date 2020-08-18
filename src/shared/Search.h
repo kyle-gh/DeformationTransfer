@@ -20,11 +20,9 @@
 #include <memory>
 #include <list>
 
-class Grid
+class Search
 {
 private:
-    
-    
     typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
     typedef Kernel::Point_3 Point_d;
     
@@ -79,9 +77,7 @@ private:
     typedef CGAL::Search_traits_adapter<std::size_t, point_property_map, TreeTraits_Base> TreeTraits;
     
     typedef CGAL::Orthogonal_incremental_neighbor_search<TreeTraits> IncrementalSearch;
-    typedef CGAL::Orthogonal_k_neighbor_search<TreeTraits> Search;
-    
-    typedef Search::Distance Distance;
+    typedef IncrementalSearch::Distance Distance;
     
     //typedef CGAL::Kd_tree<TreeTraits> Tree;
     typedef IncrementalSearch::Tree Tree;
@@ -112,7 +108,7 @@ public:
     typedef std::vector<Result> Results;
     
 public:
-	Grid();
+	Search();
     
     void setMesh(MeshPtr mesh, bool setBounds = true);
     
@@ -149,6 +145,6 @@ private:
     void add(const Mesh::FaceHandle& f, const Mesh::Point& p);
 };
 
-bool IsEqual(const Grid::Result& a, const Grid::Result& b);
+bool IsEqual(const Search::Result& a, const Search::Result& b);
 
-bool CompareDistance(const Grid::Result& a, const Grid::Result& b);
+bool CompareDistance(const Search::Result& a, const Search::Result& b);

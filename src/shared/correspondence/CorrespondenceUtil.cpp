@@ -203,7 +203,7 @@ CorrespondenceUtil::ConstraintMapPtr CorrespondenceUtil::BuildConstraints(Corres
     return map;
 }
 
-unsigned int _Build(MeshPtr mesh, Grid& grid, Correspondence& corr, size_t numItems, std::function<bool(MeshPtr, int, Mesh::Point&, Mesh::Normal&)> get, float threshold = -1.0, int limit = -1, bool defaultToNearest = false, bool mulithread = true)
+unsigned int _Build(MeshPtr mesh, Search& search, Correspondence& corr, size_t numItems, std::function<bool(MeshPtr, int, Mesh::Point&, Mesh::Normal&)> get, float threshold = -1.0, int limit = -1, bool defaultToNearest = false, bool mulithread = true)
 {
     corr.setSize(numItems);
     
@@ -211,7 +211,7 @@ unsigned int _Build(MeshPtr mesh, Grid& grid, Correspondence& corr, size_t numIt
     std::mutex itemLock;
     
     auto searchOp =
-    [&mesh, &grid, &corr, &get, threshold, limit, defaultToNearest, &items, numItems, &itemLock]
+    [&mesh, &search, &corr, &get, threshold, limit, defaultToNearest, &items, numItems, &itemLock]
     (int threadId)
     {
         int item = 0;
@@ -219,10 +219,10 @@ unsigned int _Build(MeshPtr mesh, Grid& grid, Correspondence& corr, size_t numIt
         Mesh::Point p;
         Mesh::Normal n;
         
-        Grid::Results results;
-        Grid::Result nearest;
+        Search::Results results;
+        Search::Result nearest;
         
-        Grid::Context context;
+        Search::Context context;
         
         bool nearestSearch = threshold <= 0 && limit <= 1;
         
@@ -247,12 +247,12 @@ unsigned int _Build(MeshPtr mesh, Grid& grid, Correspondence& corr, size_t numIt
             
             if (nearestSearch)
             {
-                if (grid.getNearest(p, n, nearest))
+                if (search.getNearest(p, n, nearest))
                     corr.add(item, nearest.idx);
             }
             else
             {
-                if (grid.getRange(p, n, threshold, results, &context))
+                if (search.getRange(p, n, threshold, results, &context))
                 {
                     std::sort(results.begin(), results.end(), CompareDistance);
                     
@@ -267,7 +267,7 @@ unsigned int _Build(MeshPtr mesh, Grid& grid, Correspondence& corr, size_t numIt
                 else
                 {
                     if (defaultToNearest)
-                        if (grid.getNearest(p, n, nearest))
+                        if (search.getNearest(p, n, nearest))
                             corr.add(item, nearest.idx);
                 }
             }
@@ -292,7 +292,7 @@ unsigned int _Build(MeshPtr mesh, Grid& grid, Correspondence& corr, size_t numIt
     return 1;
 }
 
-void CorrespondenceUtil::BuildVertex(MeshPtr mesh, Grid& grid, Correspondence& corr, float threshold, int limit, bool defaultToNearest)
+void CorrespondenceUtil::BuildVertex(MeshPtr mesh, Search& search, Correspondence& corr, float threshold, int limit, bool defaultToNearest)
 {
     auto get =
     []
@@ -306,10 +306,10 @@ void CorrespondenceUtil::BuildVertex(MeshPtr mesh, Grid& grid, Correspondence& c
         return true;
     };
     
-    _Build(mesh, grid, corr, mesh->n_vertices(), get, threshold, limit, defaultToNearest, false);
+    _Build(mesh, search, corr, mesh->n_vertices(), get, threshold, limit, defaultToNearest, false);
 }
 
-void CorrespondenceUtil::BuildFace(MeshPtr mesh, Grid& grid, Correspondence& corr, float threshold, int limit, bool defaultToNearest)
+void CorrespondenceUtil::BuildFace(MeshPtr mesh, Search& search, Correspondence& corr, float threshold, int limit, bool defaultToNearest)
 {
     auto get =
     []
@@ -323,7 +323,7 @@ void CorrespondenceUtil::BuildFace(MeshPtr mesh, Grid& grid, Correspondence& cor
         return true;
     };
     
-    _Build(mesh, grid, corr, mesh->n_faces(), get, threshold, limit, defaultToNearest);
+    _Build(mesh, search, corr, mesh->n_faces(), get, threshold, limit, defaultToNearest);
 }
 
 void CorrespondenceUtil::BuildAdjacency(MeshPtr mesh, Correspondence& corr)

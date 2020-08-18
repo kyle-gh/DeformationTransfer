@@ -1,6 +1,6 @@
-#include "Grid.h"
+#include "Search.h"
 
-//std::vector<Grid::PointContainerVector::value_type> Grid::PointContainerVector::_temp;
+//std::vector<Search::PointContainerVector::value_type> Search::PointContainerVector::_temp;
 
 inline Mesh::Point uvCentroid(MeshPtr mesh, const Mesh::FaceHandle& face)
 {
@@ -31,21 +31,21 @@ inline Mesh::Point uv(MeshPtr mesh, const Mesh::VertexHandle& vert)
     return Mesh::Point(tc[0], tc[1], 0);
 }
 
-Grid::Grid()
+Search::Search()
 : _ppMap(_points)
 , _distance(_ppMap)
 , _tree(nullptr)
 {
 }
 
-void Grid::setMesh(MeshPtr mesh, bool setBounds)
+void Search::setMesh(MeshPtr mesh, bool setBounds)
 {
     clear();
     
     _mesh = mesh;
 }
 
-void Grid::clear()
+void Search::clear()
 {
     _tree = nullptr;//.clear();
     _points.clear();
@@ -53,7 +53,7 @@ void Grid::clear()
     _numAdded = 0;
 }
 
-void Grid::addFaces(bool useNormal, bool useUV)
+void Search::addFaces(bool useNormal, bool useUV)
 {
     clear();
     
@@ -103,10 +103,10 @@ void Grid::addFaces(bool useNormal, bool useUV)
     
     _useNormal = useNormal;
     
-    std::cout << "Grid - Faces: " << _points.size() << std::endl;
+    std::cout << "Search - Faces: " << _points.size() << std::endl;
 }
 
-void Grid::addVertices(bool useNormal, bool useUV)
+void Search::addVertices(bool useNormal, bool useUV)
 {
     clear();
     
@@ -153,22 +153,22 @@ void Grid::addVertices(bool useNormal, bool useUV)
     
     _useNormal = useNormal;
     
-    std::cout << "Grid - Vertices: " << _points.size() << std::endl;
+    std::cout << "Search - Vertices: " << _points.size() << std::endl;
 }
 
-void Grid::add(const Mesh::VertexHandle& v, const Mesh::Point& p)
+void Search::add(const Mesh::VertexHandle& v, const Mesh::Point& p)
 {
     _points[v.idx()] = Point_d(p[0], p[1], p[2]);
     _numAdded++;
 }
 
-void Grid::add(const Mesh::FaceHandle& f, const Mesh::Point& p)
+void Search::add(const Mesh::FaceHandle& f, const Mesh::Point& p)
 {
     _points[f.idx()] = Point_d(p[0], p[1], p[2]);
     _numAdded++;
 }
 
-bool Grid::getNearest(const OpenMesh::Vec3d& p, const OpenMesh::Vec3d& n, Result& result)
+bool Search::getNearest(const OpenMesh::Vec3d& p, const OpenMesh::Vec3d& n, Result& result)
 {
     result.idx = -1;
     result.distanceSqr = __DBL_MAX__;
@@ -200,7 +200,7 @@ bool Grid::getNearest(const OpenMesh::Vec3d& p, const OpenMesh::Vec3d& n, Result
     return result.idx != -1;
 }
 
-bool Grid::getRange(const Mesh::Point& p, const Mesh::Point& n, float threshold, Results& results, Context* context)
+bool Search::getRange(const Mesh::Point& p, const Mesh::Point& n, float threshold, Results& results, Context* context)
 {
     results.clear();
     
@@ -264,12 +264,12 @@ bool Grid::getRange(const Mesh::Point& p, const Mesh::Point& n, float threshold,
     return !results.empty();
 }
 
-bool IsEqual(const Grid::Result& a, const Grid::Result& b)
+bool IsEqual(const Search::Result& a, const Search::Result& b)
 {
     return a.idx == b.idx;
 }
 
-bool CompareDistance(const Grid::Result& a, const Grid::Result& b)
+bool CompareDistance(const Search::Result& a, const Search::Result& b)
 {
     return (a.distanceSqr < b.distanceSqr);
 }

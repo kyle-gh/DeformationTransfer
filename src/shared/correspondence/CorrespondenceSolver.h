@@ -11,7 +11,7 @@
 
 #include "../SolverBase.h"
 
-#include "../Grid.h"
+#include "../Search.h"
 
 #include "../DenseCorrespondence.h"
 #include "../SingleDenseCorrespondence.h"
@@ -68,7 +68,7 @@ private:
     
     DenseCorrespondence _faceAdjacency;
     
-    Grid _grid;
+    Search _search;
     
     SingleDenseCorrespondence _nearestCorr;
     
