@@ -20,21 +20,14 @@
 CorrespondenceSolver::CorrespondenceSolver()
 : SolverBase()
 {
+    // Default weights as described in the paper.
     _weights = {
-        {1.0, 0.1, 0},
-        {1.0, 0.1, 1},
-        {1.0, 0.1, 30},
-        {1.0, 0.1, 40},
-        {1.0, 0.1, 50}
+        {1.0, 0.001, 0},
+        {1.0, 0.001, 1},
+        {1.0, 0.001, 1666.0},
+        {1.0, 0.001, 3333.0},
+        {1.0, 0.001, 5000.0}
     };
-    
-//    _weights = {
-//        {1.0, 0.001, 0},
-//        {1.0, 0.001, 1},
-//        {1.0, 0.001, 1666.0},
-//        {1.0, 0.001, 3333.0},
-//        {1.0, 0.001, 5000.0}
-//    };
     
     _maxCorrespondence = 3;
 }
@@ -187,7 +180,7 @@ void CorrespondenceSolver::solveSI(const Weights& weights)
         << "Solving Smoothness+Identity" << std::endl
         << "\tProblem Size: " << rowSize << " x " << colSize << " :: " << colSize << " x 1" << std::endl;
     
-    _m.reserve(rowSize * colSize);
+    //_m.reserve(rowSize * colSize);
     _m.clear();
     
     _A.resize(rowSize, colSize);
@@ -213,7 +206,7 @@ void CorrespondenceSolver::solveSIC(const Weights& weights)
         << "Solving Smoothness+Identity+Closest" << std::endl
         << "\tProblem Size: " << rowSize << " x " << colSize << " :: " << colSize << " x 1" << std::endl;
     
-    _m.reserve(rowSize * colSize);
+    //_m.reserve(rowSize * colSize);
     _m.clear();
     
     _A.resize(rowSize, colSize);

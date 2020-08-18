@@ -53,9 +53,17 @@ add_executable(transfer
         src/transfer/Transfer.cpp
         ${shared_sources}
         ${shared_headers}
-        )
+)
 
 target_link_libraries(transfer ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
+
+add_executable(test
+        src/test/Test.cpp
+        ${shared_sources}
+        ${shared_headers}
+)
+
+target_link_libraries(test ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
 
 add_executable(cortool
         src/corrtool/Camera.cpp
@@ -68,6 +76,6 @@ add_executable(cortool
         src/corrtool/MeshView.h
         ${shared_sources}
         ${shared_headers}
-        )
+)
 
 target_link_libraries(cortool ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS}  ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
