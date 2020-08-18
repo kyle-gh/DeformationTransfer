@@ -39,7 +39,7 @@ private:
     
     size_t _numVertices;
     
-    unsigned int _row;
+    int _row;
     
     std::vector<Matrix3x3> _invVr;
     std::vector<Matrix3x3> _Vd;

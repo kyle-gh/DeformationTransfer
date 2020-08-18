@@ -77,7 +77,7 @@ private:
     std::vector<Matrix9x4> _es;
     std::vector<Matrix9x1> _cs;
     
-    unsigned int _row;
+    int _row;
     
     TripletList _m;
     SparseMatrix _A;

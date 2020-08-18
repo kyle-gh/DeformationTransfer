@@ -87,7 +87,7 @@ bool CorrespondenceSolver::setVertexConstraints(ConstraintMapPtr map)
     
     std::cout
         << "Vertex Constraints:" << std::endl
-        << "\tContrained: " << _anchorMap->size() << std::endl
+        << "\tConstrained: " << _anchorMap->size() << std::endl
         << "\tFree: " << (_source->n_vertices() - _anchorMap->size()) << std::endl;
     
     _vertexMap.resize(_source->n_vertices());
@@ -343,7 +343,7 @@ void CorrespondenceSolver::appendClosest(const Correspondence& nearest, double w
 
 void CorrespondenceSolver::appendClosest(const Mesh::VertexHandle& vert, const Correspondence& nearest, double weight, TripletList& m, MatrixX& c)
 {
-    const auto idx = vertexIndex(vert);
+    const auto idx = (int)vertexIndex(vert);
     
     const auto nearestVert = _target->vertex_handle(nearest.get(vert.idx())[0]);
     const auto nearestP = _target->point(nearestVert);
@@ -387,7 +387,7 @@ void CorrespondenceSolver::appendEC(const Mesh::FaceHandle& face, const Matrix9x
         {
             for (int vert = 0; vert < 4; vert++)
             {
-                const auto idx = vertIndices[vert];
+                const int idx = (int)vertIndices[vert];
                 if (idx != INVALID)
                 {
                     m.push_back(Triplet{_row, idx + coord, weight * face_e(l_row, vert)});

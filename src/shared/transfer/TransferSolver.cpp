@@ -284,7 +284,7 @@ void TransferSolver::constructA(const Mesh& mesh, const Mesh::FaceHandle& face, 
         {
             for (int vert = 0; vert < 4; vert++)
             {
-                const auto vertIdx = vertexIdx[vert];
+                const int vertIdx = (int)vertexIdx[vert];
                 
                 triplets.push_back(Triplet{_row, vertIdx + coord, e(j_row, vert)});
             }
