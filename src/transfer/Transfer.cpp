@@ -17,44 +17,97 @@
 #include <iomanip>
 #include <filesystem>
 
+#include <cxxopts.hpp>
+
 int main(int argc, char* argv[])
 {
-    if (argc < 4)
+    cxxopts::Options options("transfer", "Transfer deformation from one mesh to another");
+
+    options.add_options()
+        ("r,source-ref", "Path to the source reference mesh", cxxopts::value<std::string>())
+        ("d,source-deform", "Path to the source deform mesh", cxxopts::value<std::string>())
+        ("t,target-ref", "Path to the target reference mesh", cxxopts::value<std::string>())
+        ("v,vertex-corr", "Path to the vertex correspondence file", cxxopts::value<std::string>(), "Vertex or face correspondence must be provided")
+        ("f,face-corr", "Path to the face correspondence file", cxxopts::value<std::string>(), "Vertex or face correspondence must be provided")
+        ("o,output", "Path to save the deformed target mesh to", cxxopts::value<std::string>())
+        ;
+
+    std::string sourceRefPath;
+    std::string sourceDeformPath;
+    std::string targetRefPath;
+    std::string vertCorrespondencePath;
+    std::string faceCorrespondencePath;
+    std::string outputPath;
+
+    try
     {
-        std::cerr << "Too few arguments" << std::endl;
+        auto result = options.parse(argc, argv);
+
+        if (!result.count("r") || !result.count("d") || !result.count("t") || !result.count("o"))
+        {
+            std::cout << options.help() << std::endl;
+            exit(1);
+        }
+
+        if (!result.count("v") && !result.count("f"))
+        {
+            std::cout << options.help() << std::endl;
+            exit(1);
+        }
+
+        sourceRefPath = result["source-ref"].as<std::string>();
+        sourceDeformPath = result["source-deform"].as<std::string>();
+        targetRefPath = result["target-ref"].as<std::string>();
+
+        if (result.count("v"))
+        {
+            vertCorrespondencePath = result["vertex-corr"].as<std::string>();
+        }
+        else
+        {
+            faceCorrespondencePath = result["face-corr"].as<std::string>();
+        }
+
+        outputPath = result["output"].as<std::string>();
+    }
+    catch (const cxxopts::OptionException& e)
+    {
+        std::cout << "error parsing options: " << e.what() << std::endl;
         exit(1);
     }
 
-    std::string sourceRefPath = argv[1];
-    std::string sourceDeformPath = argv[2];
-    std::string targetRefPath = argv[3];
-    std::string vertCorrespondencePath = argv[4];
-    std::string outputPath = argv[5];
-    std::string faceCorrespondencePath = std::tmpnam(nullptr);
-
     MeshPtr sourceRef = ReadMesh(sourceRefPath, true);
     MeshPtr sourceDeform = ReadMesh(sourceDeformPath, true);
-    
+
     MeshPtr targetRef = ReadMesh(targetRefPath, true);
-    
+
     MeshPtr targetDeform = MakeMesh(targetRef);
-    
-    CorrespondenceSolver::ConstraintMapPtr anchorMap = nullptr;
 
-    CorrespondencePtr vertCorrespondence = std::make_shared<SparseCorrespondence>();
-    vertCorrespondence->read(vertCorrespondencePath);
+    auto tempFaceCorrPath = false;
+    if (faceCorrespondencePath.empty())
+    {
+        faceCorrespondencePath = std::tmpnam(nullptr);
+        tempFaceCorrPath = true;
+    }
 
-    anchorMap = CorrespondenceUtil::BuildConstraints(vertCorrespondence, targetRef);
+    if (!vertCorrespondencePath.empty())
+    {
+        CorrespondenceSolver::ConstraintMapPtr anchorMap = nullptr;
 
-    std::cout << std::endl << "=Correspondence Resolver=" << std::endl;
-    
-    TIMER_START(CorrespondenceResolver)
+        CorrespondencePtr vertCorrespondence = std::make_shared<SparseCorrespondence>();
+        vertCorrespondence->read(vertCorrespondencePath);
 
-    CorrespondenceSolver resolver;
-    resolver.setSourceReference(sourceRef);
-    resolver.setTargetReference(targetRef);
-    resolver.setVertexConstraints(anchorMap);
-    
+        anchorMap = CorrespondenceUtil::BuildConstraints(vertCorrespondence, targetRef);
+
+        std::cout << std::endl << "=Correspondence Resolver=" << std::endl;
+
+        TIMER_START(CorrespondenceResolver)
+
+        CorrespondenceSolver resolver;
+        resolver.setSourceReference(sourceRef);
+        resolver.setTargetReference(targetRef);
+        resolver.setVertexConstraints(anchorMap);
+
 //    resolver.setStepCallback([](int step, MeshPtr m) {
 //        char path[1024];
 //        sprintf(path, "results/template-random1-%d.obj", step);
@@ -62,11 +115,12 @@ int main(int argc, char* argv[])
 //        WriteMesh(p, m);
 //    });
 
-    resolver.resolve();
+        resolver.resolve();
 
-    resolver.faceCorrespondence().write(faceCorrespondencePath);
+        resolver.faceCorrespondence().write(faceCorrespondencePath);
 
-    TIMER_END(CorrespondenceResolver)
+        TIMER_END(CorrespondenceResolver)
+    }
 
     std::cout << std::endl << "=Deformation Transfer=" << std::endl;
     
@@ -75,7 +129,10 @@ int main(int argc, char* argv[])
     auto faceCorrespondence = std::make_shared<DenseCorrespondence>();
     faceCorrespondence->read(faceCorrespondencePath);
 
-    std::remove(faceCorrespondencePath.c_str());
+    if (tempFaceCorrPath)
+    {
+        std::remove(faceCorrespondencePath.c_str());
+    }
 
     std::stringstream path;
     
@@ -83,7 +140,7 @@ int main(int argc, char* argv[])
     
     xfer.setSourceReference(sourceRef);
     
-    if (!xfer.setTargetReference(targetRef, faceCorrespondence))
+    if (!xfer.setTargetReference(targetRef, faceCorrespondence, true))
     {
         std::cerr << "Failed to set target reference" << std::endl;
         exit(1);

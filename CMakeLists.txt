@@ -34,6 +34,8 @@ find_package(CGAL)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+set(CXXOPTS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../cxxopts/include)
+
 set_property(
     DIRECTORY
     APPEND PROPERTY COMPILE_DEFINITIONS _USE_MATH_DEFINES
@@ -45,6 +47,7 @@ include_directories(src/transfer)
 include_directories(src/shared)
 include_directories(src/shared/correspondence)
 include_directories(src/shared/transfer)
+include_directories(${CXXOPTS_INCLUDE_DIR})
 
 file(GLOB_RECURSE shared_sources src/shared/*.c*)
 file(GLOB_RECURSE shared_headers src/shared/*.h*)
