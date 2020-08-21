@@ -58,7 +58,15 @@ add_executable(transfer
         ${shared_headers}
 )
 
-target_link_libraries(transfer ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
+target_link_libraries(transfer ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
+
+add_executable(correspondence
+        src/correspondence/Correspondence.cpp
+        ${shared_sources}
+        ${shared_headers}
+        )
+
+target_link_libraries(correspondence ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
 
 add_executable(test
         src/test/Test.cpp
@@ -66,7 +74,7 @@ add_executable(test
         ${shared_headers}
 )
 
-target_link_libraries(test ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
+target_link_libraries(test ${OPENMESH_LIBRARIES} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} CGAL::CGAL)
 
 add_executable(cortool
         src/corrtool/Camera.cpp

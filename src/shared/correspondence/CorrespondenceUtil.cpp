@@ -340,87 +340,17 @@ void CorrespondenceUtil::BuildAdjacency(MeshPtr mesh, Correspondence& corr)
             
             corr.add(face.idx(), adj_face.idx());
         }
-        
-        //        auto& c = corr.get(face.idx());
-        //
-        //        if (c.size() == 3)
-        //        {
-        //            std::swap(c[0], c[1]);
-        //            std::swap(c[1], c[2]);
-        //        }
     }
 }
 
-/*
-MeshPtr morphTo(MeshPtr source, MeshPtr target)
+void CorrespondenceUtil::Reverse(CorrespondencePtr corr, CorrespondencePtr rev)
 {
-    auto morph = MakeMesh(source);
-    
-    std::vector<Triangle2> triangles;
-    triangles.resize(target->n_faces());
-    
-    std::vector<double> c;
-    c.reserve(3);
-    
-    for (auto faceIter = target->faces_begin(), faceEnd = target->faces_end(); faceIter != faceEnd; faceIter++)
+    Correspondence::PairsList pairs;
+    corr->getPairs(pairs);
+
+    for (const auto& pair : pairs)
     {
-        const auto face = *faceIter;
-        
-        triangles[face.idx()] = uvTriangle(target, face);
+        rev->add(pair.second, pair.first);
     }
-    
-    std::cout << "Built Triangles: " << triangles.size() << std::endl;
-    
-    std::cout << "Genereting new vertices" << std::endl;
-    
-    size_t numVertices = 0;
-    
-    for (auto vertIter = source->vertices_begin(), vertEnd = source->vertices_end(); vertIter != vertEnd; vertIter++)
-    {
-        const auto vert = *vertIter;
-        
-        if (vert.idx() % 100 == 0)
-            std::cout << "Vert: " << vert.idx();
-        
-        const auto& tc = source->texcoord2D(vert);
-        const auto uv = Point2(tc[0], tc[1]);
-        
-        for (auto i = 0; i < triangles.size(); i++)
-        {
-            const auto& triangle = triangles[i];
-            if (triangle.is_degenerate())
-                continue;
-            
-            const auto side = triangle.oriented_side(uv);
-            if (side == CGAL::ON_NEGATIVE_SIDE)
-                continue;
-            
-            c.clear();
-            uvBarycentric(target, target->face_handle(i))(uv, c);
-            
-            if (!isValid(c))
-                continue;
-            
-            const auto np = barycenterPosition(target, target->face_handle(i), c);
-            const auto nn = barycenterNormal(target, target->face_handle(i), c);
-            
-            morph->point(morph->vertex_handle(vert.idx())) = np;
-            morph->set_normal(morph->vertex_handle(vert.idx()), nn);
-            
-            if (vert.idx() % 100 == 0)
-                std::cout << " -> " << i << std::endl;
-            
-            numVertices++;
-            
-            break;
-        }
-    }
-    
-    if (numVertices != morph->n_vertices())
-    {
-        std::cout << "Vertices Morphed: " << numVertices << "/" << morph->n_vertices() << std::endl;
-    }
-    
-    return morph;
 }
-*/
+

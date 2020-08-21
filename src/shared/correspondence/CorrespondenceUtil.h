@@ -31,6 +31,8 @@ public:
     static void BuildFace(MeshPtr mesh, Search& search, Correspondence& corr, float threshold = -1.0, int limit = -1, bool defaultToNearest = false);
     
     static void BuildAdjacency(MeshPtr mesh, Correspondence& corr);
+
+    static void Reverse(CorrespondencePtr corr, CorrespondencePtr rev);
 };
 
 #endif /* CorrespondenceUtil_h */
